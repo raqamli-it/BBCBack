@@ -124,28 +124,17 @@ CHANNEL_LAYERS = {
 # }
 
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'bbc_new_db',
-#         'USER': 'bbc_new_user',
-#         'PASSWORD': 'bbc_new_password',
-#         'HOST': 'postgres_bbc_new',  # container name
-#         'PORT': '5432',
-#     }
-# }
-
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'bbc',
         'USER': 'bbc_user',
         'PASSWORD': 'bbc_password',
-        'HOST': 'localhost',
+        'HOST': 'bbc_db',
         'PORT': '5432',
     }
 }
+
 
 
 # Password validation

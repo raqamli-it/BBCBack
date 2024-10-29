@@ -1,20 +1,35 @@
-# Use the official Python image as a base image
-FROM python:3.10-slim
+# Base image
+FROM python:3.10
 
-# Set the working directory in the container
-WORKDIR /app
+# Working directory
+WORKDIR /bbc
 
-# Copy the requirements file into the container
-COPY requirements.txt /app/
+# Environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-# Install the dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Install system dependencies
+RUN apt-get update && apt-get install -y build-essential libpq-dev
 
-# Copy the current directory contents into the container at /app
-COPY . /app/
+# Install Python dependencies
+COPY requirements.txt /bbc/
+RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
-# Expose port 8000 to allow connections
-EXPOSE 1234
+# Create and set permissions for staticfiles folder
+RUN mkdir -p /bbc/staticfiles
+RUN chmod 755 /bbc/staticfiles
 
-# Define the command to run the application
-CMD ["sh", "-c", "python manage.py migrate && python manage.py collectstatic --noinput && python manage.py runserver 0.0.0.0:1234"]
+# Copy project files
+COPY . /bbc/
+
+# Collect static files
+RUN python manage.py collectstatic --noinput
+
+# Django settings
+ENV DJANGO_SETTINGS_MODULE=config.settings
+
+# Expose port
+EXPOSE 8000
+
+# Run migrations and start Daphne server
+CMD ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
