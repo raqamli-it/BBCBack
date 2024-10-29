@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  web:
+    networks:
+      - bbc_networks
+    container_name: bbc-app
+    image: userhubdocker1/bbc:latest
+    ports:
+      - "1234:1234"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis-db:
+        condition: service_healthy
+    environment:
+      - DJANGO_DEBUG=False
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             python manage.py runserver 0.0.0.0:8000"
+
+  redis-db:
+    container_name: bbc-redis
+    image: redis
+    ports:
+      - "6381:6381"
+    networks:
+      - bbc_networks
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  db:
+    image: postgres:13
+    container_name: postgres_bbc
+    environment:
+      POSTGRES_DB: bbc_new_db
+      POSTGRES_USER: bbc_new_user
+      POSTGRES_PASSWORD: bbc_new_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - bbc_networks
+    ports:
+      - "5433:5433"
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d bbc_new_db" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres_data:
+
+networks:
+  bbc_networks:
+    driver: bridge
