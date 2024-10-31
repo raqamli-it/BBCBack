@@ -186,6 +186,15 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
     'language-code',
 ]
 
+CORS_ALLOWED_ORIGINS = [
+    'https://backend.bbcavtomotors.uz',
+    'https://subdomain.bbcavtomotors.uz'
+]
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+CSRF_TRUSTED_ORIGINS = ['https://backend.bbcavtomotors.uz', 'https://subdomain.bbcavtomotors.uz']
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
